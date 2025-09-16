@@ -19,7 +19,20 @@ This project provides a synthetic supermarket data generator using SDV (Single T
 ├── producer.py       # Main Python script for data generation and API
 ├── supermarket.csv   # Raw data used to train SDV synthesizer
 ```
-### How to use : 
+### How to use :
+
+Build image : 
+
+```
+make build
+```
+Run container :
+```
+make run
+```
+
+### All command :
+
 ```
 | Command      | Description                                                                   |
 | ------------ | ----------------------------------------------------------------------------- |
