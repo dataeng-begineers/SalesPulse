@@ -18,7 +18,7 @@ This project provides a synthetic supermarket data generator using SDV (Single T
 ├── Makefile          # Docker build, run, start, stop, remove commands
 ├── producer.py       # Main Python script for data generation and API
 ├── supermarket.csv   # Raw data used to train SDV synthesizer
-
+```
 ## How to use : 
 ```
 | Command      | Description                                                                   |
