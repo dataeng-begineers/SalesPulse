@@ -4,14 +4,14 @@ This project provides a synthetic supermarket data generator using SDV (Single T
 
 ----
 
-## Features
+### Features
 
 - Generates synthetic supermarket sales data based on `supermarket.csv`  
 - Continuously appends new rows to `synthetic.db`  
 - Provides a FastAPI endpoint `/latest` to fetch the most recent record  
 - Runs in a Docker container for easy deployment 
 
-## Project structure 
+### Project structure 
 
 ```
 .
@@ -19,7 +19,7 @@ This project provides a synthetic supermarket data generator using SDV (Single T
 ├── producer.py       # Main Python script for data generation and API
 ├── supermarket.csv   # Raw data used to train SDV synthesizer
 ```
-## How to use : 
+### How to use : 
 ```
 | Command      | Description                                                                   |
 | ------------ | ----------------------------------------------------------------------------- |
@@ -55,6 +55,7 @@ Response example
     "Payment": "Cash"
   }
 ]
+```
 
 
 ### Extending the API
