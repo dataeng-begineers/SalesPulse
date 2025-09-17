@@ -1,21 +1,29 @@
-from confluent_kafka import Producer
-from feature.datagenerator import generate_sale_event
+import requests
+from kafka import KafkaProducer
 import json
 import time
 
-producer_conf = {'bootstrap.servers': 'localhost:9092'}
-producer = Producer(producer_conf)
-topic = "supermarket_sales"
+# Kafka setup
+producer = KafkaProducer(
+    bootstrap_servers='kafka:9092',  # Use service name from docker-compose
+    value_serializer=lambda v: json.dumps(v).encode('utf-8')
+)
 
-print("Starting Kafka producer...")
+while True:
+    try:
+        # Fetch latest data from FastAPI service
+        response = requests.get("http://fastapi-service:8000/latest")
+        data = response.json()
+        
+        # Send each record to Kafka
+        for record in data:
+            producer.send('sales_topic', record)
+            print(f"Sent: {record}")
 
-try:
-    while True:
-        event = generate_sale_event()
-        producer.produce(topic, value=json.dumps(event))
-        producer.flush()
-        print("Produced event:", event)
-        time.sleep(1)
+        time.sleep(1)  # Fetch data every second
 
-except KeyboardInterrupt:
-    print("Producer stopped.")
+    except Exception as e:
+        print(f"Error fetching/sending data: {e}")
+        time.sleep(5)
+
+
