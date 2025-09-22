@@ -1,9 +1,7 @@
-version: '3.8'
-
 services:
   fastapi-service:
     build:
-      context: ./fastapi-service
+      context: ./fastapi_service
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
