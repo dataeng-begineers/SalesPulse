@@ -4,13 +4,13 @@ FROM python:3.11-slim
 # Set working directory inside the container
 WORKDIR /app
 
-# Copy producer code into the container
+# Copy your application files
 COPY kafka-producer.py .
+# COPY feature/ /app/feature/ # Assuming your data generator is here
 
-# Install required Python packages
-RUN pip install --no-cache-dir kafka-python requests
+# Install the correct Python package for your script
+RUN pip install --no-cache-dir confluent-kafka
+RUN pip install --no-cache-dir requests
 
 # Command to run the producer
 CMD ["python", "kafka-producer.py"]
-
-

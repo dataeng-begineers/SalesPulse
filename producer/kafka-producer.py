@@ -1,34 +1,22 @@
-import requests
-from kafka import KafkaProducer
+from confluent_kafka import Producer
 import json
 import time
+import requests
 
-# Kafka setup
-for i in range(10):
-    try:
-        producer = KafkaProducer(
-            bootstrap_servers='kafka:9092',
-            value_serializer=lambda v: json.dumps(v).encode('utf-8')
-        )
-        print("Connected to Kafka!")
-        break
-    except:
-        print("Kafka not ready, retrying...")
-        time.sleep(5)
+# Connect to the Kafka service by its name in docker-compose
+producer_conf = {'bootstrap.servers': 'kafka:9092'}
+producer = Producer(producer_conf)
+topic = "supermarket_sales"
 
-while True:
-    try:
-        # Fetch latest data from FastAPI service
-        response = requests.get("http://fastapi_service:8000/latest")
-        data = response.json()
+print("Starting Kafka producer...")
 
-        # Send each record to Kafka
-        for record in data:
-            producer.send('sales_topic', record)
-            print(f"Sent: {record}")
+try:
+    while True:
+        event = requests.get("http://fastapi_service:8000/latest")
+        producer.produce(topic, value=json.dumps(event))
+        producer.flush()
+        print("Produced event:", event)
+        time.sleep(1)
 
-        time.sleep(1)  # Fetch data every second
-
-    except Exception as e:
-        print(f"Error fetching/sending data: {e}")
-        time.sleep(5)
+except KeyboardInterrupt:
+    print("Producer stopped.")
