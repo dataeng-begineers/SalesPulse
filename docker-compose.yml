@@ -6,26 +6,18 @@ services:
     networks:
       - salespulse
     ports:
-      - "8000:8000"
+      - "${FAST_API_SERVICE_PORT}:8000"
 
   kafka:
     image: bitnami/kafka:latest
-    environment:
-      # KRaft settings for Bitnami image
-      - KAFKA_CFG_NODE_ID=0
-      - KAFKA_CFG_PROCESS_ROLES=controller,broker
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
-      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+    env_file:
+      - .env
     volumes:
       - kafka_data:/bitnami/kafka
     networks:
       - salespulse
     ports:
-      - "9092:9092"
+      - "${KAFKA_PORT}:9092"
 
   producer:
     build:
@@ -37,9 +29,47 @@ services:
     networks:
       - salespulse
 
+
+  postgres:
+    container_name: postgres
+    image: postgres:17
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - salespulse
+    ports:
+      - "${POSTGRES_HOST_PORT}:5432"
+    volumes:
+       - ${POSTGRES_HOST_DIR}:${POSTGRES_CONTAINER_DIR}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  dbt:
+    container_name: dbt
+    image: ghcr.io/dbt-labs/dbt-postgres:1.9.0 
+    volumes:
+      - ${DBT_HOST_DIR}:${DBT_PROFILES_DIR}
+    networks:
+      - salespulse
+    ports:
+      - "${DBT_DAG_FLOW_PORT}:8080"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    entrypoint: ["bash"]       
+    command: ["-c", "tail -f /dev/null"]
+
 networks:
   salespulse:
     driver: bridge
+
 volumes:
   kafka_data:
     driver: local
+    
+
