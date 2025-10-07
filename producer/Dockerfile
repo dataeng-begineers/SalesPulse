@@ -1,0 +1,16 @@
+# Use a lightweight Python image
+FROM python:3.11-slim
+
+# Set working directory inside the container
+WORKDIR /app
+
+# Copy your application files
+COPY kafka-producer.py .
+# COPY feature/ /app/feature/ # Assuming your data generator is here
+
+# Install the correct Python package for your script
+RUN pip install --no-cache-dir confluent-kafka
+RUN pip install --no-cache-dir requests
+
+# Command to run the producer
+CMD ["python", "kafka-producer.py"]

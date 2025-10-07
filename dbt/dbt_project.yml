@@ -1,0 +1,9 @@
+name: salespulse
+version: "1.0"
+profile: default
+config-version: 2
+
+# Define where models are located
+models:
+  salespulse:
+    +materialized: table

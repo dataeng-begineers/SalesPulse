@@ -1,0 +1,75 @@
+services:
+  fastapi_service:
+    build:
+      context: ./fastapi_service
+      dockerfile: Dockerfile
+    networks:
+      - salespulse
+    ports:
+      - "${FAST_API_SERVICE_PORT}:8000"
+
+  kafka:
+    image: bitnami/kafka:latest
+    env_file:
+      - .env
+    volumes:
+      - kafka_data:/bitnami/kafka
+    networks:
+      - salespulse
+    ports:
+      - "${KAFKA_PORT}:9092"
+
+  producer:
+    build:
+      context: ./producer
+      dockerfile: Dockerfile
+    depends_on:
+      - fastapi_service
+      - kafka
+    networks:
+      - salespulse
+
+
+  postgres:
+    container_name: postgres
+    image: postgres:17
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - salespulse
+    ports:
+      - "${POSTGRES_HOST_PORT}:5432"
+    volumes:
+       - ${POSTGRES_HOST_DIR}:${POSTGRES_CONTAINER_DIR}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  dbt:
+    container_name: dbt
+    image: ghcr.io/dbt-labs/dbt-postgres:1.9.0 
+    volumes:
+      - ${DBT_HOST_DIR}:${DBT_PROFILES_DIR}
+    networks:
+      - salespulse
+    ports:
+      - "${DBT_DAG_FLOW_PORT}:8080"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    entrypoint: ["bash"]       
+    command: ["-c", "tail -f /dev/null"]
+
+networks:
+  salespulse:
+    driver: bridge
+
+volumes:
+  kafka_data:
+    driver: local
+    
+
