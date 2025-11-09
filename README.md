@@ -46,7 +46,7 @@ To run the project locally, make sure you have **Docker** and **Docker Compose**
 
 1.  **Clone the Repository:**
     ```bash
-    git clone [REPO_ADDRESS]
+    git clone https://github.com/dataeng-begineers/SalesPulse.git
     cd SalesPulse
     ```
 
