@@ -70,6 +70,5 @@ To run the project locally, make sure you have **Docker** and **Docker Compose**
     # To execute tests:
     docker exec [dbt_container_name] dbt test
     ```
-
 ---
 
